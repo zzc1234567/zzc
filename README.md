@@ -1,6 +1,6 @@
 # Edge Tunnel
 
-这是一种基于CF Worker的免费代理方案, 不依赖外部订阅转换
+这是一种基于CF Pages的免费代理方案, 不依赖外部订阅转换
 
 **欢迎各位大佬指正代码中存在的问题！** 
 
@@ -12,12 +12,8 @@
 
 请确保您已注册 GitHub 和 Cloudflare (简称 CF) 账号
 
-[![快速部署](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ImLTHQ/edgetunnel)
-
-**注意:** 部署 Workers 请务必绑定自定义域名
-
 1. **Fork 本项目** 
-2. **创建 Workers/Pages**
+2. **创建 Pages**
 5. **添加环境变量**
 6. **保存并部署**
 8. **生效后导入订阅**
