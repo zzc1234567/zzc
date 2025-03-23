@@ -3,7 +3,7 @@ name: 自动混淆
 on:
   push:
     paths:
-      - '明文源码.js'
+      - 'src.js'
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
