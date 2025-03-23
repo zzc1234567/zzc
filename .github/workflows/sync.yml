@@ -1,0 +1,34 @@
+name: 上游同步
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync_latest_from_upstream:
+    name: 条件判断
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v3
+
+      - name: 同步上游更改
+        id: sync
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          upstream_sync_repo: ImLTHQ/edge-tunnel
+          upstream_sync_branch: main
+          target_sync_branch: main
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 同步检查
+        if: failure()
+        run: |
+          echo "[Error] 由于上游仓库的 workflow 文件变更，导致 GitHub 自动暂停了本次自动更新，你需要手动 Sync Fork 一次"
+          exit 1 # 退出，表示任务失败

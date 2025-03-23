@@ -1,0 +1,48 @@
+name: 自动混淆
+
+on:
+  push:
+    paths:
+      - '明文源码.js'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  obfuscate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: 安装依赖
+        run: npm install -g javascript-obfuscator
+
+      - name: 混淆代码
+        run: |
+          javascript-obfuscator src.js --output _worker.js \
+          --compact true \
+          --identifier-names-generator mangled \
+          --rename-globals true
+
+      - name: 提交更改
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add _worker.js
+          git commit -m "自动混淆" || echo "No changes to commit"
+
+      - name: 上传更改
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
