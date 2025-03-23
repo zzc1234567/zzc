@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync_latest_from_upstream:
+  sync:
     name: 条件判断
     runs-on: ubuntu-latest
     if: ${{ github.event.repository.fork }}
