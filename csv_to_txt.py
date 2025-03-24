@@ -23,4 +23,4 @@ def csv_to_txt(csv_files, area_names, output_filename):
             for i, (ip, speed) in enumerate(zip(df.iloc[:, 0], df.iloc[:, 5]), start=1):
                 f.write(f"{ip}#{area} {i}\n")
 
-csv_to_txt(csv_files, area_names, "AutoTest.cnm")
+csv_to_txt(csv_files, area_names, "AutoTest.txt")
