@@ -1,6 +1,6 @@
 # Edge Tunnel
 
-这是一种基于CF Pages的免费代理方案, 不依赖外部订阅转换
+这是一种基于CF Pages的免费代理方案, 不依赖外部订阅转换, 精简配置, 适合新手使用
 
 **欢迎各位大佬指正代码中存在的问题！** 
 
@@ -32,13 +32,10 @@
 | 变量名 | 示例值 | 备注 |
 | - | - | - |
 | `SUB_PATH` | `sub` | 订阅地址:`地址/订阅路径`,  订阅路径换成`UUID`同样有效 | 
-| `SUB_UUID` | `00000000-0000-4000-0000-000000000000` | 用于验证的 UUID, 不填则使用`动态UUID`, 不包含`英文字母和数字`的`订阅路径`, 使用`动态UUID`有盗用风险! |
-| `TXT_URL` | `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/HKG.txt` | 优选 IP 的 TXT 地址, 支持多个地址, 地址之间用换行分隔格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填则使用默认节点名称 |
-| `SUB_NAME` | `节点` | 默认节点名称 |
-| `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 IP 地址和端口 |
-| `SOCKS5_GLOBAL` | `true`或`false` | 是否启用 SOCKS5 全局反代 |
-| `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理服务器的连接信息, 格式为 `账号:密码@地址:端口` |
-| `FAKE_WEB` | `baidu.com` | 根路径的伪装网站, 访问根目录时会跳转到该网站 |
+| `TXT_URL` | `https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.cnm` | 优选 IP 的 RAW 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
+| `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 IP 地址和端口, 端口不填默认443 |
+| `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
+| `FAKE_WEB` | `github.com` | 伪装网站 |
 
 <details>
 <summary><code><strong>「 第三方 ProxyIP 」</strong></code></summary>
@@ -57,17 +54,6 @@
 - `ProxyIP.DigitalOcean.CMLiussss.net`
 - `ProxyIP.Vultr.CMLiussss.net`
 - `ProxyIP.Multacom.CMLiussss.net`
-</details>
-
-<details>
-<summary><code><strong>「 本项目提供的优选 TXT 地址 」</strong></code></summary>
-
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/HKG.txt` 香港
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/KHH.txt` 台湾
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/SIN.txt` 新加坡
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/NRT.txt` 东京
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/SEA.txt` 西雅图
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/LHR.txt` 伦敦
 </details>
 
 ## 已适配客户端
@@ -102,7 +88,6 @@
 
 ## 感谢
 
-- [shulng](https://github.com/shulng) 代码建议
+- [cmliu](https://github.com/cmliu) 参考代码和ProxyIP提供者
 - [XIU2](https://github.com/XIU2) CF测速
 - [zizifn](https://github.com/zizifn) 原作者
-- [cmliu](https://github.com/cmliu) 参考代码和ProxyIP提供者

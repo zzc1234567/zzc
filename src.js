@@ -2,64 +2,42 @@ import { connect } from "cloudflare:sockets";
 
 // 配置区块
 let 订阅路径 = "sub";
-let 我的UUID;
-let 默认节点名称 = "节点";
+let 验证UUID;
 
-let 优选TXT = [
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/HKG.txt",
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/KHH.txt",
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/SIN.txt",
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/NRT.txt",
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/SEA.txt",
-  "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/SpeedTest/LHR.txt",
-];
+let 优选URL = "https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.cnm";
 let 优选列表 = [];
 
 let 反代IP = "ts.hpc.tw";
-
-let 启用SOCKS5全局反代 = false;
 let SOCKS5账号 = "";
 
-let 伪装网页 = "";
+let 伪装网页 = "github.com";
 
 // 网页入口
 export default {
   async fetch(访问请求, env) {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
-    我的UUID = env.SUB_UUID ?? 动态UUID();
-    默认节点名称 = env.SUB_NAME ?? 默认节点名称;
-    优选TXT = env.TXT_URL ? 字符串转数组(env.TXT_URL) : 优选TXT;
+    验证UUID = 动态UUID();
+    优选URL = env.TXT_URL ?? 优选URL;
     反代IP = env.PROXY_IP ?? 反代IP;
     SOCKS5账号 = env.SOCKS5 ?? SOCKS5账号;
-    启用SOCKS5全局反代 = env.SOCKS5_GLOBAL === "true";
     伪装网页 = env.FAKE_WEB ?? 伪装网页;
 
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const url = new URL(访问请求.url);
     if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
-      if (优选TXT.length > 0) {
-        优选列表 = [
-          ...new Set(
-            (
-              await Promise.all(
-                优选TXT.map(async (url) => {
-                  const response = await fetch(url);
-                  return response.ok
-                    ? (await response.text())
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter((line) => line)
-                    : [];
-                })
-              )
-            ).flat()
-          ),
-        ];
+
+      if (优选URL) {
+        const 读取优选文本 = await fetch(优选URL);
+        const 转换优选文本 = await 读取优选文本.text();
+        优选列表 = 转换优选文本
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line);
       }
+
       const 编码订阅路径 = encodeURIComponent(订阅路径);
       switch (url.pathname) {
         case `/${编码订阅路径}`:
-        case `/${我的UUID}`:
           const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
           const 配置生成器 = {
             v2ray: v2ray配置文件,
@@ -70,14 +48,10 @@ export default {
           const 生成配置 = 配置生成器[工具 || "default"];
           return 生成配置(访问请求.headers.get("Host"));
         default:
-          if (伪装网页) {
             url.hostname = 伪装网页;
             url.protocol = "https:";
             访问请求 = new Request(url, 访问请求);
             return fetch(访问请求);
-          } else {
-            return 生成项目介绍页面();
-          }
       }
     } else if (读取我的请求标头 === "websocket") {
       return await 升级WS请求(访问请求);
@@ -104,7 +78,7 @@ function 使用64位加解密(还原混淆字符) {
 }
 //第二步，解读VL协议数据，创建TCP握手
 async function 解析VL标头(VL数据, TCP接口) {
-  if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 我的UUID) {
+  if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 验证UUID) {
     return null;
   }
   const 获取数据定位 = new Uint8Array(VL数据)[17];
@@ -138,36 +112,21 @@ async function 解析VL标头(VL数据, TCP接口) {
       break;
   }
   const 写入初始数据 = VL数据.slice(地址信息索引 + 地址长度);
-  if (启用SOCKS5全局反代 && SOCKS5账号) {
-    TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
-  } else {
     try {
-      TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+      TCP接口 = await connect({hostname: 访问地址, port: 访问端口});
       await TCP接口.opened;
     } catch {
-      if (SOCKS5账号) {
-        try {
+        if (SOCKS5账号) {
           TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
-          await TCP接口.opened;
-        } catch {
-          if (反代IP) {
-            let [反代IP地址, 反代IP端口] = 反代IP.split(":");
-            TCP接口 = await connect({
-              hostname: 反代IP地址,
-              port: Number(反代IP端口) || 443,
-            });
-          }
+        } else {
+          let [反代IP地址, 反代IP端口] = 反代IP.split(':');
+          TCP接口 = await connect({
+            hostname: 反代IP地址,
+            port: 反代IP端口 || 443,
+          });
         }
-      } else if (反代IP) {
-        let [反代IP地址, 反代IP端口] = 反代IP.split(":");
-        TCP接口 = await connect({
-          hostname: 反代IP地址,
-          port: Number(反代IP端口) || 443,
-        });
-      }
     }
-  }
-  return { TCP接口, 写入初始数据 };
+    return { TCP接口, 写入初始数据 };
 }
 function 验证VL的密钥(arr, offset = 0) {
   const uuid = (
@@ -199,15 +158,17 @@ for (let i = 0; i < 256; ++i) {
   转换密钥格式.push((i + 256).toString(16).slice(1));
 }
 //第三步，创建客户端WS-CF-目标的传输通道并监听状态
-async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+async function 建立传输管道(WS接口, TCP接口, 写入初始数据, TCP缓存 = [], WS缓存 = []) {
   const 传输数据 = TCP接口.writable.getWriter();
   await WS接口.send(new Uint8Array([0, 0]).buffer); //向客户端发送WS握手认证信息
   TCP接口.readable.pipeTo(
     new WritableStream({
-      //将TCP接口返回的数据通过WS接口发送回客户端【优先建立客户端与CF的WS回传通道，防止初始包返回数据时通道任未建立导致丢失数据】
+      //将TCP接口返回的数据通过WS接口发送回客户端【优先建立客户端与CF的WS回传通道，防止初始包返回数据时通道仍未建立导致丢失数据】
       async write(VL数据) {
-        await WS接口.send(VL数据);
-      },
+        WS缓存.push(VL数据);
+        const WS数据块 = WS缓存.shift();
+        WS接口.send(WS数据块)
+      }
     })
   );
   const 数据流 = new ReadableStream({
@@ -216,23 +177,28 @@ async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
       if (写入初始数据) {
         控制器.enqueue(写入初始数据);
         写入初始数据 = null;
-      }
+      };
       WS接口.addEventListener("message", (event) => {
         控制器.enqueue(event.data);
-      }); //监听客户端WS接口消息，推送给数据流
-      WS接口.addEventListener("close", () => {
+        }
+      ); //监听客户端WS接口消息，推送给数据流
+      WS接口.addEventListener('close', () => {
         控制器.close();
-      }); //监听客户端WS接口关闭信息，结束流传输
-      WS接口.addEventListener("error", () => {
+        }
+      ); //监听客户端WS接口关闭信息，结束流传输
+      WS接口.addEventListener('error', () => {
         控制器.close();
-      }); //监听客户端WS接口异常信息，结束流传输
-    },
+        }
+      ); //监听客户端WS接口异常信息，结束流传输
+    }
   });
   数据流.pipeTo(
     new WritableStream({
       //将客户端接收到的WS数据发往TCP接口
       async write(VL数据) {
-        await 传输数据.write(VL数据);
+        TCP缓存.push(VL数据);
+        const TCP数据块 = TCP缓存.shift();
+        传输数据.write(TCP数据块);
       },
     })
   );
@@ -308,10 +274,6 @@ async function 获取SOCKS5账号(SOCKS5) {
   return { username, password, hostname, port };
 }
 // 其它
-function 字符串转数组(str) {
-  return str.split("\n");
-}
-
 function 动态UUID() {
   const 当前时间 = new Date();
 
@@ -320,39 +282,21 @@ function 动态UUID() {
   const 天数差 = Math.floor((当前时间 - 一月一日) / (24 * 60 * 60 * 1000));
   const 第几周 = Math.ceil((天数差 + 一月一日.getDay() + 1) / 7).toString().padStart(4, "0");
 
-  // 将订阅路径转换为 16 进制字符串
+  // 转换年份+第几周为16进制
+  const 前八位 = (年份 * 100 + 第几周).toString(16)
+    .padStart(8, "0")
+    .slice(0, 8);
+
+  // 转换订阅路径为16进制
   const 后12位 = Array.from(new TextEncoder().encode(订阅路径))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("")
-    .slice(0, 12)       // 取前 12 位
-    .padEnd(12, "0");   // 不足补 0
+    .slice(0, 12)
+    .padEnd(12, "0");
 
-  return `${年份}${第几周}-0000-4000-8000-${后12位}`;
+  return `${前八位}-0000-4000-8000-${后12位}`;
 }
 
-function 生成项目介绍页面() {
-  const 项目介绍 = `
-<title>项目介绍</title>
-<style>
-  body {
-    font-size: 25px;
-  }
-</style>
-<pre>
-<strong>edge-tunnel</strong>
-
-这是一种基于CF Worker的免费代理方案, 不依赖外部订阅转换
-<a href="https://github.com/ImLTHQ/edgetunnel" target="_blank">点我跳转仓库</a>
-</pre>
-`;
-
-  return new Response(项目介绍, {
-    status: 200,
-    headers: { "Content-Type": "text/html;charset=utf-8" },
-  });
-}
-
-// 订阅页面
 function 生成提示界面() {
   const 提示界面 = `
 <title>订阅-${订阅路径}</title>
@@ -374,20 +318,20 @@ function 处理优选列表(优选列表, hostName) {
     优选列表 = [`${hostName}`];
   }
   return 优选列表.map((获取优选, index) => {
-    const [地址端口, 节点名字 = `${默认节点名称} ${index + 1}`] = 获取优选.split("#");
+    const [地址端口, 节点名字 = `节点 ${index + 1}`] = 获取优选.split("#");
     const 拆分地址端口 = 地址端口.split(":");
     const 端口 = 拆分地址端口.length > 1 ? Number(拆分地址端口.pop()) : 443;
     const 地址 = 拆分地址端口.join(":").replace(/^\[(.+)\]$/, "$1");
     return { 地址, 端口, 节点名字 };
   });
 }
-
+// 订阅页面
 function v2ray配置文件(hostName) {
-  const path = encodeURIComponent("/?ed=9999");
+  const path = encodeURIComponent("/?ed=2560");
   const 节点列表 = 处理优选列表(优选列表, hostName);
   const 配置内容 = 节点列表
     .map(({ 地址, 端口, 节点名字 }) => {
-      return `vless://${我的UUID}@${地址}:${端口}?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=${path}#${节点名字}`;
+      return `vless://${验证UUID}@${地址}:${端口}?encryption=none&security=tls&sni=${hostName}&fp=chrome&type=ws&host=${hostName}&path=${path}#${节点名字}`;
     })
     .join("\n");
 
@@ -406,13 +350,13 @@ function clash配置文件(hostName) {
   type: vless
   server: ${地址}
   port: ${端口}
-  uuid: ${我的UUID}
+  uuid: ${验证UUID}
   udp: true
   tls: true
   sni: ${hostName}
   network: ws
   ws-opts:
-    path: "/?ed=9999"
+    path: "/?ed=2560"
     headers:
       Host: ${hostName}
       User-Agent: Chrome`,
@@ -432,9 +376,7 @@ function clash配置文件(hostName) {
 dns:
   enable: true
   nameserver:
-    - tls://94.140.14.14
-  fallback:
-    - tls://1.1.1.1
+    - 223.5.5.5
 
 proxies:
 ${节点配置}
