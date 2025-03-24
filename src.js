@@ -4,7 +4,7 @@ import { connect } from "cloudflare:sockets";
 let 订阅路径 = "sub";
 let 验证UUID;
 
-let 优选URL = "https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.cnm";
+let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/AutoTest.txt";
 let 优选列表 = [];
 
 let 反代IP = "ts.hpc.tw";
@@ -14,10 +14,10 @@ let 伪装网页 = "github.com";
 
 // 网页入口
 export default {
-  async fetch(访问请求, env) {
+  async fetch(访问请求, env, hostName) {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
     验证UUID = 动态UUID();
-    优选URL = env.TXT_URL ?? 优选URL;
+    优选链接 = env.TXT_URL ?? 优选链接;
     反代IP = env.PROXY_IP ?? 反代IP;
     SOCKS5账号 = env.SOCKS5 ?? SOCKS5账号;
     伪装网页 = env.FAKE_WEB ?? 伪装网页;
@@ -26,13 +26,13 @@ export default {
     const url = new URL(访问请求.url);
     if (!读取我的请求标头 || 读取我的请求标头 !== "websocket") {
 
-      if (优选URL) {
-        const 读取优选文本 = await fetch(优选URL);
-        const 转换优选文本 = await 读取优选文本.text();
-        优选列表 = 转换优选文本
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line);
+      if (优选链接) {
+          const 读取优选文本 = await fetch(优选链接);
+          const 转换优选文本 = await 读取优选文本.text();
+          优选列表 = 转换优选文本
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line);
       }
 
       const 编码订阅路径 = encodeURIComponent(订阅路径);
@@ -314,7 +314,7 @@ function 生成提示界面() {
 }
 
 function 处理优选列表(优选列表, hostName) {
-  if (优选列表.length === 0) {
+  if (优选列表.length == 0) {
     优选列表 = [`${hostName}`];
   }
   return 优选列表.map((获取优选, index) => {
@@ -325,6 +325,7 @@ function 处理优选列表(优选列表, hostName) {
     return { 地址, 端口, 节点名字 };
   });
 }
+
 // 订阅页面
 function v2ray配置文件(hostName) {
   const path = encodeURIComponent("/?ed=2560");
