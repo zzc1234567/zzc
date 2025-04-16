@@ -32,10 +32,10 @@
 | 变量名 | 示例值 | 备注 |
 | - | - | - |
 | `SUB_PATH` | `sub` | 订阅地址:`地址/订阅路径`,  订阅路径换成`UUID`同样有效 | 
-| `TXT_URL` | `https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.cnm` | 优选 IP 的 RAW 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
+| `TXT_URL` | `https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.txt` | 优选 IP 的 RAW 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
 | `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 IP 地址和端口, 端口不填默认443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
-| `FAKE_WEB` | `github.com` | 伪装网站 |
+| `SOCKS5_GLOBAL` | `true` | 全局 SOCKS5 代理 |
 
 <details>
 <summary><code><strong>「 第三方 ProxyIP 」</strong></code></summary>
