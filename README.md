@@ -10,7 +10,7 @@
 
 ## 使用方法
 
-请确保您已注册 GitHub 和 Cloudflare (简称 CF) 账号
+请确保您已注册 GitHub 和 Cloudflare账号
 
 1. **Fork 本项目** 
 2. **创建 Pages**
