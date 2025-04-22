@@ -16,7 +16,7 @@ let 反代IP = "ts.hpc.tw";
 export default {
   async fetch(访问请求, env) {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
-    验证UUID = 动态UUID();
+    验证UUID = 生成UUID();
     时区偏移 = env.TIME_OFFSET ?? 时区偏移;
     优选链接 = env.TXT_URL ?? 优选链接;
     SOCKS5代理 = env.SOCKS5 ?? SOCKS5代理;
@@ -292,27 +292,17 @@ async function 获取SOCKS5代理(SOCKS5) {
 }
 
 // 其它
-function 动态UUID() {
-  const 当前时间 = new Date();
-  const UTC时间 = 当前时间.getTime() + 当前时间.getTimezoneOffset() * 60 * 1000;
-  const 本地时间 = new Date(UTC时间 + 时区偏移 * 60 * 60 * 1000);
+function 生成UUID() {
+  const 二十位 = Array.from(new TextEncoder().encode(订阅路径))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 20)
+    .padEnd(20, "0");
 
-  const 年份 = 本地时间.getFullYear();
-  const 一月一日 = new Date(`${年份}-01-01`);
-  const 天数差 = Math.floor((本地时间 - 一月一日) / (24 * 60 * 60 * 1000));
-  const 第几周 = Math.ceil((天数差 + 一月一日.getDay() + 1) / 7)
-    .toString()
-    .padStart(2, "0");
-
-  const 转换为十六进制 = (文本, 长度) =>
-    Array.from(new TextEncoder().encode(文本))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("")
-      .slice(0, 长度)
-      .padEnd(长度, "0");
-
-  const 前八位 = 转换为十六进制(第几周, 8);
-  const 后十二位 = 转换为十六进制(订阅路径, 12);
+  const 前八位 = 二十位
+    .slice(0, 8);
+  const 后十二位 = 二十位
+    .slice(-12);
 
   return `${前八位}-0000-4000-8000-${后十二位}`;
 }

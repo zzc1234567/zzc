@@ -2,7 +2,7 @@
 
 这是一种基于CF Pages的免费代理方案, 不依赖外部订阅转换, 精简配置, 适合新手使用
 
-**欢迎各位大佬指正代码中存在的问题！** 
+**欢迎各位大佬指正代码中存在的问题！**
 
 [![Stargazers over time](https://starchart.cc/ImLTHQ/edgetunnel.svg?variant=adaptive)](https://starchart.cc/ImLTHQ/edgetunnel)
 
@@ -10,30 +10,32 @@
 
 ## 使用方法
 
-请确保您已注册 GitHub 和 Cloudflare账号
+请确保您已注册 GitHub 和 Cloudflare 账号
 
-1. **Fork 本项目** 
+1. **Fork 本项目**
 2. **创建 Pages**
-5. **添加环境变量**
-6. **保存并部署**
-8. **生效后导入订阅**
+3. **添加环境变量**
+4. **保存并部署**
+5. **生效后导入订阅**
 
 <details>
 <summary><code><strong>「 建议做的 」</strong></code></summary>
 
 **设置 GitHub Action 同步上游仓库**
+
 1. 来到您 Fork 的仓库
 2. 在 `Actions` 选项卡中, 点击 `Enable workflow`, 选择 `上游同步`
 3. 启用此 Workflow 可以使您的仓库与作者的更新保持同步
+
 </details>
 
 ## 变量说明
 
 | 变量名 | 示例值 | 备注 |
-| - | - | - |
-| `SUB_PATH` | `sub` | 订阅地址:`地址/订阅路径`,  订阅路径换成`UUID`同样有效 | 
-| `TXT_URL` | `https://raw.domain.com/AutoTest.txt` | 优选 IP, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
-| `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 IP 地址和端口, 端口不填默认443 |
+|-|-|-|
+| `SUB_PATH` | `sub` | `地址/订阅路径` |
+| `TXT_URL` | `https://raw.githubusercontent.com/XiaoYeCK/edgetunnel/refs/heads/main/AutoTest.txt` | 优选 IP 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
+| `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 地址和端口, 端口不填默认443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
 | `SOCKS5_GLOBAL` | `true` | 全局 SOCKS5 代理 |
 
@@ -54,6 +56,7 @@
 - `ProxyIP.DigitalOcean.CMLiussss.net`
 - `ProxyIP.Vultr.CMLiussss.net`
 - `ProxyIP.Multacom.CMLiussss.net`
+
 </details>
 
 ## 已适配客户端
@@ -63,7 +66,7 @@
 
 ## 免责声明
 
-本免责声明适用于 GitHub 上的 "edgetunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
+本免责声明适用于 GitHub 上的 "edge-tunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
 
 **用途**
 
