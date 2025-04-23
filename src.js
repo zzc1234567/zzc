@@ -3,7 +3,6 @@ import { connect } from "cloudflare:sockets";
 // 配置区块
 let 订阅路径 = "sub";
 let 验证UUID;
-let 时区偏移 = 8;
 
 let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/refs/heads/main/AutoTest.txt";
 let 优选列表 = [];
@@ -17,27 +16,19 @@ export default {
   async fetch(访问请求, env) {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
     验证UUID = 生成UUID();
-    时区偏移 = env.TIME_OFFSET ?? 时区偏移;
     优选链接 = env.TXT_URL ?? 优选链接;
     SOCKS5代理 = env.SOCKS5 ?? SOCKS5代理;
     SOCKS5全局反代 = env.SOCKS5_GLOBAL ?? SOCKS5全局反代;
     反代IP = env.PROXY_IP ?? 反代IP;
 
+    优选列表 = await 获取优选列表();
+
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const WS请求 = 读取我的请求标头 == "websocket";
-    const 不是WS请求 = !读取我的请求标头 || 读取我的请求标头.toLowerCase() !== "websocket";
+    const 不是WS请求 = 读取我的请求标头?.toLowerCase() !== "websocket";
     const url = new URL(访问请求.url);
 
     if (不是WS请求) {
-      if (优选链接) {
-        const 读取优选文本 = await fetch(优选链接);
-        const 转换优选文本 = await 读取优选文本.text();
-        优选列表 = 转换优选文本
-          .split("\n")
-          .map((line) => line.trim())
-          .filter((line) => line);
-      }
-
       if (url.pathname == `/${订阅路径}`) {
         const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
         const 配置生成器 = {
@@ -329,6 +320,18 @@ function 错误页面() {
 	  status: 200,
 	  headers: { "Content-Type": "text/plain;charset=utf-8" },
 	});
+}
+
+async function 获取优选列表() {
+  if (优选链接) {
+    const 读取优选文本 = await fetch(优选链接);
+    const 转换优选文本 = await 读取优选文本.text();
+    return 转换优选文本
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line);
+  }
+  return [];
 }
 
 function 处理优选列表(优选列表, hostName) {
