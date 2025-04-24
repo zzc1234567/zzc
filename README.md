@@ -66,7 +66,7 @@
 
 ## 免责声明
 
-本免责声明适用于 GitHub 上的 "edge-tunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
+本免责声明适用于 GitHub 上的 "edgetunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
 
 **用途**
 
