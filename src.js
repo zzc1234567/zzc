@@ -21,8 +21,6 @@ export default {
     SOCKS5全局反代 = env.SOCKS5_GLOBAL ?? SOCKS5全局反代;
     反代IP = env.PROXY_IP ?? 反代IP;
 
-    优选列表 = await 获取优选列表();
-
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const WS请求 = 读取我的请求标头 == "websocket";
     const 不是WS请求 = 读取我的请求标头?.toLowerCase() !== "websocket";
@@ -37,6 +35,7 @@ export default {
           tips: 提示界面,
         };
         const 工具 = Object.keys(配置生成器).find((工具) => 用户代理.includes(工具));
+        优选列表 = await 获取优选列表();
         const 生成配置 = 配置生成器[工具 || "tips"];
         return 生成配置(访问请求.headers.get("Host"));
       } else {
