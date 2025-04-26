@@ -4,7 +4,7 @@ import { connect } from "cloudflare:sockets";
 let 订阅路径 = "sub";
 let 验证UUID;
 
-let 优选链接 = "";
+let 优选链接;
 let 优选列表 = [];
 
 let SOCKS5代理 = false;
