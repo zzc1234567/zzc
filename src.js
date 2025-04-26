@@ -4,7 +4,7 @@ import { connect } from "cloudflare:sockets";
 let 订阅路径 = "sub";
 let 验证UUID;
 
-let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/refs/heads/main/AutoTest.txt";
+let 优选链接 = "";
 let 优选列表 = [];
 
 let SOCKS5代理 = false;
@@ -298,16 +298,18 @@ function 生成UUID() {
   return `${前八位}-0000-4000-8000-${后十二位}`;
 }
 
-function 提示界面() {
+async function 提示界面() {
   const 提示界面 = `
 <title>订阅-${订阅路径}</title>
 <style>
   body {
     font-size: 25px;
+    text-align: center;
   }
 </style>
-<strong>请把链接导入clash或v2ray</strong>
+<strong>请把链接导入 Clash 或 V2Ray</strong>
 `;
+
   return new Response(提示界面, {
     status: 200,
     headers: { "Content-Type": "text/html;charset=utf-8" },

@@ -1,6 +1,6 @@
 # Edge Tunnel
 
-这是一种基于CF Worker的免费代理方案, 不依赖外部订阅转换, 精简配置, 适合新手使用
+这是一种基于CF Pages的免费代理方案, 不依赖外部订阅转换, 精简配置, 适合新手使用
 
 **欢迎各位大佬指正代码中存在的问题！**
 
@@ -13,7 +13,7 @@
 请确保您已注册 GitHub 和 Cloudflare 账号
 
 1. **Fork 本项目**
-2. **创建 Pages(推荐)/Workers(需要域名)**
+2. **创建 Pages**
 3. **添加环境变量**
 4. **保存并部署**
 5. **生效后导入订阅**
@@ -34,10 +34,18 @@
 | 变量名 | 示例值 | 备注 |
 |-|-|-|
 | `SUB_PATH` | `sub` | `地址/订阅路径` |
-| `TXT_URL` | `https://raw.domain.com/AutoTest.txt` | 优选 IP 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
+| `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
 | `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 地址和端口, 端口不填默认443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
 | `SOCKS5_GLOBAL` | `true` | 全局 SOCKS5 代理 |
+
+<details>
+<summary><code><strong>「 项目提供的优选IP地址 」</strong></code></summary>
+
+- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
+- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
+
+</details>
 
 <details>
 <summary><code><strong>「 第三方 ProxyIP 」</strong></code></summary>
@@ -66,7 +74,7 @@
 
 ## 免责声明
 
-本免责声明适用于 GitHub 上的 "edgetunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
+本免责声明适用于 GitHub 上的 "edge-tunnel" 项目 (以下简称"本项目"), 项目链接为`https://github.com/ImLTHQ/edgetunnel`
 
 **用途**
 
