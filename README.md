@@ -42,8 +42,8 @@
 <details>
 <summary><code><strong>「 项目提供的优选IP地址 」</strong></code></summary>
 
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
+- CFST测速`https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
+- 随机IP`https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
 
 </details>
 
