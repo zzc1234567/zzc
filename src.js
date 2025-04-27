@@ -1,7 +1,7 @@
 import { connect } from "cloudflare:sockets";
 
 // 配置区块
-let 订阅路径 = "sub";
+let 订阅路径 = "订阅";
 let 验证UUID;
 
 let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt";
@@ -27,7 +27,7 @@ export default {
     const url = new URL(访问请求.url);
 
     if (不是WS请求) {
-      if (url.pathname == `/${订阅路径}`) {
+      if (url.pathname == `/${encodeURIComponent(订阅路径)}`) {
         const 用户代理 = 访问请求.headers.get("User-Agent").toLowerCase();
         const 配置生成器 = {
           v2ray: v2ray配置文件,
