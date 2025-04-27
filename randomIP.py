@@ -3,7 +3,7 @@ import ipaddress
 import requests
 
 url = "https://www.cloudflare-cn.com/ips-v4"
-ip_count = 15
+ip_count = 30
 
 cidr_list = requests.get(url).text.strip().splitlines()
 
