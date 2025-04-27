@@ -33,7 +33,7 @@
 
 | 变量名 | 示例值 | 备注 |
 |-|-|-|
-| `SUB_PATH` | `sub` | `地址/订阅路径` |
+| `SUB_PATH` | `订阅` | `地址/路径` |
 | `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
 | `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 地址和端口, 端口不填默认443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
@@ -42,8 +42,8 @@
 <details>
 <summary><code><strong>「 项目提供的优选IP地址 」</strong></code></summary>
 
-- CFST测速`https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
-- 随机IP`https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
+- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
+- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
 
 </details>
 
