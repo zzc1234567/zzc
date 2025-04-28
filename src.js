@@ -9,7 +9,7 @@ let 优选列表 = [];
 
 let SOCKS5代理 = false;
 let SOCKS5全局反代 = false;
-let 反代IP = "ts.hpc.tw";
+let 反代IP = "ProxyIP.SG.CMLiussss.net";
 
 // 网页入口
 export default {
