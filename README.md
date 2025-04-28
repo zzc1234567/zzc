@@ -56,7 +56,6 @@
 - `ProxyIP.US.CMLiussss.net`
 - `ProxyIP.SG.CMLiussss.net`
 - `ProxyIP.JP.CMLiussss.net`
-- `ProxyIP.HK.CMLiussss.net`
 - `ProxyIP.KR.CMLiussss.net`
 - `ProxyIP.DE.tp2024.CMLiussss.net`
 - `ProxyIP.Aliyun.CMLiussss.net`
