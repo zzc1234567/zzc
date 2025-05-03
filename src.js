@@ -8,8 +8,8 @@ let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/ran
 let 优选列表 = [];
 
 let SOCKS5代理 = false;
-let SOCKS5全局反代 = false;
-let 反代IP = "ProxyIP.SG.CMLiussss.net";
+let SOCKS5全局代理 = false;
+let 反代IP = "ts.hpc.tw";
 
 // 网页入口
 export default {
@@ -18,7 +18,7 @@ export default {
     验证UUID = 生成UUID();
     优选链接 = env.TXT_URL ?? 优选链接;
     SOCKS5代理 = env.SOCKS5 ?? SOCKS5代理;
-    SOCKS5全局反代 = env.SOCKS5_GLOBAL ?? SOCKS5全局反代;
+    SOCKS5全局代理 = env.SOCKS5_GLOBAL ?? SOCKS5全局代理;
     反代IP = env.PROXY_IP ?? 反代IP;
 
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
@@ -113,7 +113,7 @@ async function 解析VL标头(VL数据, TCP接口) {
 
   const 写入初始数据 = VL数据.slice(地址信息索引 + 地址长度);
 
-  if (SOCKS5全局反代 && SOCKS5代理) {
+  if (SOCKS5全局代理 && SOCKS5代理) {
     TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
     await TCP接口.opened;
   } else {
@@ -405,8 +405,8 @@ ${代理配置}
 - name: ♻️ 延迟优选
   type: url-test
   url: https://www.google.com/generate_204
-  interval: 300
-  tolerance: 150
+  interval: 1000
+  tolerance: 250
   proxies:
 ${代理配置}
 

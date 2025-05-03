@@ -40,14 +40,6 @@
 | `SOCKS5_GLOBAL` | `true` | 全局 SOCKS5 代理 |
 
 <details>
-<summary><code><strong>「 项目提供的优选IP地址 」</strong></code></summary>
-
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/CFST.txt`
-- `https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt`
-
-</details>
-
-<details>
 <summary><code><strong>「 第三方 ProxyIP 」</strong></code></summary>
 
 有能力请自建
@@ -101,5 +93,4 @@
 ## 感谢
 
 - [cmliu](https://github.com/cmliu) 参考代码和ProxyIP提供者
-- [XIU2](https://github.com/XIU2) CF测速
 - [zizifn](https://github.com/zizifn) 原作者
