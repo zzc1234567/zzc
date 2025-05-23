@@ -52,16 +52,11 @@ export default {
 // 脚本主要架构
 // 第一步，读取和构建基础访问结构
 async function 升级WS请求(访问请求) {
-  const 创建WS接口 = new WebSocketPair();
-  const [客户端, WS接口] = Object.values(创建WS接口);
-  WS接口.accept();
-
-  const 读取我的加密访问内容数据头 = 访问请求.headers.get("sec-websocket-protocol");
-  const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头);
-  const { TCP接口, 写入初始数据 } = await 解析VL标头(解密数据);
-  建立传输管道(WS接口, TCP接口, 写入初始数据);
-
-  return new Response(null, { status: 101, webSocket: 客户端 });
+  const [客户端, WS接口] = new WebSocketPair(); //创建WS接口对象
+  const 读取我的加密访问内容数据头 = 访问请求.headers.get('sec-websocket-protocol'); //读取访问标头中的WS通信数据
+  const 解密数据 = 使用64位加解密(读取我的加密访问内容数据头); //解密目标访问数据，传递给TCP握手进程
+  await 解析VL标头(解密数据, WS接口); //解析VL数据并进行TCP握手
+  return new Response(null, { status: 101, webSocket: 客户端 }); //一切准备就绪后，回复客户端WS连接升级成功
 }
 
 function 使用64位加解密(还原混淆字符) {
@@ -72,7 +67,7 @@ function 使用64位加解密(还原混淆字符) {
 }
 
 // 第二步，解读VL协议数据，创建TCP握手
-async function 解析VL标头(VL数据, TCP接口) {
+async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 验证UUID) {
     return null;
   }
@@ -133,7 +128,7 @@ async function 解析VL标头(VL数据, TCP接口) {
       }
     }
   }
-  return { TCP接口, 写入初始数据 };
+  建立传输管道(WS接口, TCP接口, 写入初始数据); //建立WS接口与TCP接口的传输管道
 }
 
 function 验证VL的密钥(arr, offset = 0) {
@@ -169,45 +164,30 @@ for (let i = 0; i < 256; ++i) {
 
 // 第三步，创建客户端WS-CF-目标的传输通道并监听状态
 async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+  // 建立连接和初始化
+  WS接口.accept();
+  await WS接口.send(new Uint8Array([0, 0]).buffer);
+
+  // 获取TCP流读写器
   const 传输数据 = TCP接口.writable.getWriter();
-  await WS接口.send(new Uint8Array([0, 0]).buffer); // 向客户端发送WS握手认证信息
+  const 读取数据 = TCP接口.readable.getReader();
 
-  TCP接口.readable.pipeTo(
-    new WritableStream({
-      async write(VL数据) {
-        await WS接口.send(VL数据);
-      },
-    })
-  );
+  // 写入初始数据（如果有）
+  if (写入初始数据) await 传输数据.write(写入初始数据);
 
-  const 数据流 = new ReadableStream({
-    async start(控制器) {
-      if (写入初始数据) {
-        控制器.enqueue(写入初始数据);
-        写入初始数据 = null;
-      }
-
-      WS接口.addEventListener("message", (event) => {
-        控制器.enqueue(event.data);
-      });
-
-      WS接口.addEventListener("close", () => {
-        控制器.close();
-      });
-
-      WS接口.addEventListener("error", () => {
-        控制器.close();
-      });
-    },
+  // WebSocket消息转发到TCP
+  WS接口.addEventListener("message", async (event) => {
+    await 传输数据.write(event.data);
   });
 
-  数据流.pipeTo(
-    new WritableStream({
-      async write(VL数据) {
-        await 传输数据.write(VL数据);
-      },
-    })
-  );
+  // TCP数据转发到WebSocket
+  (async () => {
+    while (true) {
+      const { value: 返回数据, done } = await 读取数据.read();
+      if (done) break;
+      if (返回数据) await WS接口.send(返回数据);
+    }
+  })();
 }
 
 // SOCKS5部分
@@ -405,8 +385,8 @@ ${代理配置}
 - name: ♻️ 延迟优选
   type: url-test
   url: https://www.google.com/generate_204
-  interval: 1000
-  tolerance: 250
+  interval: 500
+  tolerance: 300
   proxies:
 ${代理配置}
 
