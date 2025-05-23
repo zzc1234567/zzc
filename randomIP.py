@@ -4,7 +4,7 @@ import requests
 import subprocess
 
 url = "https://www.cloudflare-cn.com/ips-v4"
-ip_count = 50
+ip_count = 3
 
 cidr_list = requests.get(url).text.strip().splitlines()
 all_ips = [str(ip) for cidr in cidr_list for ip in ipaddress.ip_network(cidr, strict=False).hosts()]
