@@ -35,28 +35,9 @@
 |-|-|-|
 | `SUB_PATH` | `订阅` | `地址/路径` |
 | `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 地址, 格式`地址:端口#节点名称`端口不填默认 443, 节点名称不填使用默认名称 |
-| `PROXY_IP` | `ts.hpc.tw:443` | 反代服务器 地址和端口, 端口不填默认443 |
+| `PROXY_IP` | `ts.hpc.tw:443` | 反代 (有能力请自建) 地址和端口, 端口不填默认443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理 |
 | `SOCKS5_GLOBAL` | `true` | 全局 SOCKS5 代理 |
-
-<details>
-<summary><code><strong>「 第三方 ProxyIP 」</strong></code></summary>
-
-有能力请自建
-
-- `ts.hpc.tw`
-- `ProxyIP.US.CMLiussss.net`
-- `ProxyIP.SG.CMLiussss.net`
-- `ProxyIP.JP.CMLiussss.net`
-- `ProxyIP.KR.CMLiussss.net`
-- `ProxyIP.DE.tp2024.CMLiussss.net`
-- `ProxyIP.Aliyun.CMLiussss.net`
-- `ProxyIP.Oracle.CMLiussss.net`
-- `ProxyIP.DigitalOcean.CMLiussss.net`
-- `ProxyIP.Vultr.CMLiussss.net`
-- `ProxyIP.Multacom.CMLiussss.net`
-
-</details>
 
 ## 已适配客户端
 
@@ -91,6 +72,4 @@
 作者保留随时更新本免责声明的权利, 且不另行通知最新版本的免责声明将发布在本项目的 GitHub 页面上
 
 ## 感谢
-
-- [cmliu](https://github.com/cmliu) 参考代码和ProxyIP提供者
 - [zizifn](https://github.com/zizifn) 原作者
