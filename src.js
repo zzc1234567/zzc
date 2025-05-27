@@ -6,6 +6,7 @@ let 验证UUID;
 
 let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt";
 let 优选列表 = [];
+let DOH = "1.1.1.1";
 
 // 网页入口
 export default {
@@ -13,6 +14,7 @@ export default {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
     验证UUID = 生成UUID();
     优选链接 = env.TXT_URL ?? 优选链接;
+    DOH = env.DOH ?? DOH;
 
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const WS请求 = 读取我的请求标头 == "websocket";
@@ -134,7 +136,7 @@ function 转换IPv4到NAT64(ipv4地址) {
 // 解析域名到IPv4地址
 async function 解析域名到IPv4(域名) {
   try {
-    const 响应 = await fetch(`https://1.1.1.1/dns-query?name=${域名}&type=A`, {
+    const 响应 = await fetch(`https://${DOH}/dns-query?name=${域名}&type=A`, {
       headers: {
         "Accept": "application/dns-json"
       }
