@@ -2,10 +2,12 @@ import { connect } from "cloudflare:sockets";
 
 // 配置区块
 let 订阅路径 = "订阅";
+
 let 验证UUID;
 
 let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt";
 let 优选列表 = [];
+
 let DOH = "1.1.1.1";
 
 // 网页入口
