@@ -51,8 +51,8 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 
 ## 提醒
 
-- CloudFlare 明文禁止优选IP和使用CF Pages/Workers部署代理, 封号风险自己承担
-- 部分用户可能需要使用v2ray的分片功能才能正常上网
+- CloudFlare 明文禁止优选IP和使用CF Pages部署代理, 封号风险自己承担
+- 部分用户可能需要使用v2ray的分片功能才能正常上网, 给Pages绑定自定义域名也许可以解决
 
 ## 感谢
 - [zizifn](https://github.com/zizifn) 原作者
