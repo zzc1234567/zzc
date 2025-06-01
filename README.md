@@ -41,7 +41,7 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 
 | 变量名 | 示例值 | 说明 |
 |-|-|-|
-| `SUB_PATH` | `订阅` | 订阅路径 |
+| `SUB_PATH` | `订阅路径` | 域名/`订阅路径` 不填则直接访问根目录即可 |
 | `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 列表，格式：`地址:端口#节点名称`，端口默认 443 |
 | `PROXY_IP` | `ts.hpc.tw:443` | 反代地址和端口，端口不填默认 443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理配置 |
@@ -52,6 +52,7 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 ## 提醒
 
 - CloudFlare 明文禁止优选IP和使用CF Pages/Workers部署代理, 封号风险自己承担
+- 部分用户可能需要使用v2ray的分片功能才能正常上网
 
 ## 感谢
 - [zizifn](https://github.com/zizifn) 原作者
