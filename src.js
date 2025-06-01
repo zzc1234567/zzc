@@ -354,7 +354,7 @@ async function 获取优选列表() {
 }
 
 function 处理优选列表(优选列表, hostName) {
-  优选列表.unshift(hostName);
+  优选列表.unshift(`${hostName}#原生节点`);
   return 优选列表.map((获取优选, index) => {
     const [地址端口, 节点名字 = `节点 ${index + 1}`] = 获取优选.split("#");
     const 拆分地址端口 = 地址端口.split(":");
@@ -423,8 +423,8 @@ ${代理配置}
 - name: ♻️ 延迟优选
   type: url-test
   url: https://www.google.com/generate_204
-  interval: 500
-  tolerance: 300
+  interval: 30
+  tolerance: 100
   proxies:
 ${代理配置}
 
