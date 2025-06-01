@@ -1,7 +1,7 @@
 import { connect } from "cloudflare:sockets";
 
 // 配置区块
-let 订阅路径 = "";
+let 订阅路径 = "订阅路径";
 
 let 验证UUID;
 
