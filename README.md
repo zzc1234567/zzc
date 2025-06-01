@@ -55,3 +55,4 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 
 ## 感谢
 - [zizifn](https://github.com/zizifn) 原作者
+- [XIU2](https://github.com/XIU2) 优选IP程序作者
