@@ -1,16 +1,18 @@
 import { connect } from "cloudflare:sockets";
 
 // 配置区块
-let 订阅路径 = "订阅";
+let 订阅路径 = "";
 
 let 验证UUID;
 
-let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt";
+let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/AutoTest.txt";
 let 优选列表 = [];
 
 let SOCKS5代理 = false;
 let SOCKS5全局代理 = false;
+
 let 反代IP = "ts.hpc.tw";
+
 let NAT64前缀 = "2001:67c:2960:6464::";
 let DOH地址 = "1.1.1.1";
 
