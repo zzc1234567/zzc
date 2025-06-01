@@ -11,8 +11,4 @@ all_ips = [str(ip) for cidr in cidr_list for ip in ipaddress.ip_network(cidr, st
 random_ips = random.sample(all_ips, ip_count)
 
 with open("randomIP.txt", "w") as file:
-<<<<<<< HEAD
     file.write("\n".join(random_ips))
-=======
-    file.write("\n".join(random_ips))
->>>>>>> 3f6781a164c795aca01794f0e694fefc833fb00d
