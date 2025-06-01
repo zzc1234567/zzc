@@ -1,4 +1,0 @@
-name = "worker"
-main = "_worker.js"
-workers_dev = true
-compatibility_date = "2025-03-24"

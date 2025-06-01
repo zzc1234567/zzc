@@ -8,7 +8,11 @@ let 验证UUID;
 let 优选链接 = "https://raw.githubusercontent.com/ImLTHQ/edgetunnel/main/randomIP.txt";
 let 优选列表 = [];
 
-let DOH = "1.1.1.1";
+let SOCKS5代理 = false;
+let SOCKS5全局代理 = false;
+let 反代IP = "ts.hpc.tw";
+let NAT64前缀 = "2001:67c:2960:6464::";
+let DOH地址 = "1.1.1.1";
 
 // 网页入口
 export default {
@@ -16,7 +20,11 @@ export default {
     订阅路径 = env.SUB_PATH ?? 订阅路径;
     验证UUID = 生成UUID();
     优选链接 = env.TXT_URL ?? 优选链接;
-    DOH = env.DOH ?? DOH;
+    SOCKS5代理 = env.SOCKS5 ?? SOCKS5代理;
+    SOCKS5全局代理 = env.SOCKS5_GLOBAL ?? SOCKS5全局代理;
+    反代IP = env.PROXY_IP ?? 反代IP;
+    NAT64前缀 = env.NAT64 ?? NAT64前缀;
+    DOH地址 = env.DOH ?? DOH地址;
 
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const WS请求 = 读取我的请求标头 == "websocket";
@@ -36,7 +44,7 @@ export default {
         const 生成配置 = 配置生成器[工具 || "tips"];
         return 生成配置(访问请求.headers.get("Host"));
       } else {
-        return 错误页面();
+          return new Response(null, { status: 404 });
       }
     }
 
@@ -63,7 +71,7 @@ function 使用64位加解密(还原混淆字符) {
   return 解密.buffer;
 }
 
-// 第二步，解读VL协议数据，创建TCP握手（直连或NAT64）
+// 第二步，解读VL协议数据，创建TCP握手（直连、SOCKS5、反代、NAT64）
 async function 解析VL标头(VL数据, WS接口, TCP接口) {
   if (验证VL的密钥(new Uint8Array(VL数据.slice(1, 17))) !== 验证UUID) {
     return null;
@@ -105,55 +113,142 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
 
   const 写入初始数据 = VL数据.slice(地址信息索引 + 地址长度);
 
-  try {
-    TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+  // 优先SOCKS5全局
+  if (SOCKS5全局代理 && SOCKS5代理) {
+    TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
     await TCP接口.opened;
-  } catch {
-    const NAT64地址 = 识别地址类型 === 1
-      ? 转换IPv4到NAT64(访问地址)
-      : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
-    TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
+  } else {
+    try {
+      TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+      await TCP接口.opened;
+    } catch {
+      // 尝试SOCKS5
+      if (SOCKS5代理) {
+        try {
+          TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
+          await TCP接口.opened;
+        } catch {
+          // SOCKS5失败，尝试反代
+          try {
+            let [反代IP地址, 反代IP端口] = 反代IP.split(":");
+            TCP接口 = await connect({
+              hostname: 反代IP地址,
+              port: 反代IP端口 || 443,
+            });
+            await TCP接口.opened;
+          } catch {
+            // 反代失败，尝试NAT64
+            const NAT64地址 = 识别地址类型 === 1
+              ? 转换IPv4到NAT64(访问地址)
+              : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
+            TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
+          }
+        }
+      } else {
+        // 没有SOCKS5，直接尝试反代
+        try {
+          let [反代IP地址, 反代IP端口] = 反代IP.split(":");
+          TCP接口 = await connect({
+            hostname: 反代IP地址,
+            port: 反代IP端口 || 443,
+          });
+          await TCP接口.opened;
+        } catch {
+          // 反代失败，尝试NAT64
+          const NAT64地址 = 识别地址类型 === 1
+            ? 转换IPv4到NAT64(访问地址)
+            : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
+          TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
+        }
+      }
+    }
   }
-
   建立传输管道(WS接口, TCP接口, 写入初始数据);
+}
+
+// SOCKS5部分
+async function 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口) {
+  const { username, password, hostname, port } = await 获取SOCKS5代理(SOCKS5代理);
+  const SOCKS5接口 = connect({ hostname, port });
+  try {
+    await SOCKS5接口.opened;
+  } catch {
+    return new Response("SOCKS5未连通", { status: 400 });
+  }
+  const writer = SOCKS5接口.writable.getWriter();
+  const reader = SOCKS5接口.readable.getReader();
+  const encoder = new TextEncoder();
+  const socksGreeting = new Uint8Array([5, 2, 0, 2]); //支持无认证和用户名/密码认证
+  await writer.write(socksGreeting);
+  let res = (await reader.read()).value;
+  if (res[1] === 0x02) {
+    //用户名/密码认证
+    if (!username || !password) {
+      return 关闭接口并退出();
+    }
+    const authRequest = new Uint8Array([1, username.length, ...encoder.encode(username), password.length, ...encoder.encode(password)]);
+    await writer.write(authRequest);
+    res = (await reader.read()).value;
+    if (res[0] !== 0x01 || res[1] !== 0x00) {
+      return 关闭接口并退出();
+    }
+  }
+  let 转换访问地址;
+  switch (识别地址类型) {
+    case 1: // IPv4
+      转换访问地址 = new Uint8Array([1, ...访问地址.split(".").map(Number)]);
+      break;
+    case 2: // 域名
+      转换访问地址 = new Uint8Array([3, 访问地址.length, ...encoder.encode(访问地址)]);
+      break;
+    case 3: // IPv6
+      转换访问地址 = new Uint8Array([4, ...访问地址.split(":").flatMap((x) => [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2), 16)])]);
+      break;
+    default:
+      return 关闭接口并退出();
+  }
+  const socksRequest = new Uint8Array([5, 1, 0, ...转换访问地址, 访问端口 >> 8, 访问端口 & 0xff]);
+  await writer.write(socksRequest);
+  res = (await reader.read()).value;
+  if (res[0] !== 0x05 || res[1] !== 0x00) {
+    return 关闭接口并退出();
+  }
+  writer.releaseLock();
+  reader.releaseLock();
+  return SOCKS5接口;
+  function 关闭接口并退出() {
+    writer.releaseLock();
+    reader.releaseLock();
+    SOCKS5接口.close();
+    return new Response("SOCKS5握手失败", { status: 400 });
+  }
+}
+async function 获取SOCKS5代理(SOCKS5) {
+  const [latter, former] = SOCKS5.split("@").reverse();
+  let username, password, hostname, port;
+  if (former) {
+    const formers = former.split(":");
+    username = formers[0];
+    password = formers[1];
+  }
+  const latters = latter.split(":");
+  port = Number(latters.pop());
+  hostname = latters.join(":");
+  return { username, password, hostname, port };
 }
 
 // 将IPv4地址转换为NAT64 IPv6地址
 function 转换IPv4到NAT64(ipv4地址) {
-  const 部分 = ipv4地址.split(".");
-  if (部分.length !== 4) {
-    throw new Error("无效的IPv4地址");
-  }
-  const 十六进制 = 部分.map(段 => {
-    const 数字 = parseInt(段, 10);
-    if (数字 < 0 || 数字 > 255) {
-      throw new Error("无效的IPv4地址段");
-    }
-    return 数字.toString(16).padStart(2, "0");
-  });
-  // 构造NAT64 IPv6地址：2001:67c:2960:6464::xxxx:xxxx
-  return `[2001:67c:2960:6464::${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
+  const 十六进制 = ipv4地址.split(".").map(段 => (+段).toString(16).padStart(2, "0"));
+  return `[${NAT64前缀}${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
 }
 
 // 解析域名到IPv4地址
 async function 解析域名到IPv4(域名) {
-  try {
-    const 响应 = await fetch(`https://${DOH}/dns-query?name=${域名}&type=A`, {
-      headers: {
-        "Accept": "application/dns-json"
-      }
-    });
-    const 结果 = await 响应.json();
-    if (结果.Answer && 结果.Answer.length > 0) {
-      const A记录 = 结果.Answer.find(记录 => 记录.type === 1);
-      if (A记录) {
-        return A记录.data;
-      }
-    }
-    throw new Error("无法解析域名的IPv4地址");
-  } catch (错误) {
-    throw new Error(`DNS解析失败: ${错误.message}`);
-  }
+  const { Answer } = await (await fetch(`https://${DOH地址}/dns-query?name=${域名}&type=A`, {
+    headers: { "Accept": "application/dns-json" }
+  })).json();
+  return Answer.find(({ type }) => type === 1).data;
 }
 
 function 验证VL的密钥(arr, offset = 0) {
@@ -241,14 +336,6 @@ async function 提示界面() {
   return new Response(提示界面, {
     status: 200,
     headers: { "Content-Type": "text/html;charset=utf-8" },
-  });
-}
-
-function 错误页面() {
-  const 错误页面 = `请输入正确的订阅路径`;
-  return new Response(错误页面, {
-    status: 200,
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
   });
 }
 
