@@ -434,7 +434,7 @@ ${代理配置}
   type: url-test
   url: https://www.google.com/generate_204
   interval: 30
-  tolerance: 100
+  tolerance: 50
   proxies:
 ${代理配置}
 - name: ♻️ 故障转移
