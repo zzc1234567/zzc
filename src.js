@@ -445,15 +445,11 @@ ${代理配置}
 ${代理配置}
 
 rules:
-  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
-  - DOMAIN-SUFFIX,steamusercontent.com,DIRECT
-  - DOMAIN-SUFFIX,steamstatic.com,DIRECT
-  - DOMAIN-SUFFIX,steamserver.net,DIRECT
-  - DOMAIN-SUFFIX,steampowered.com,DIRECT
-
   - GEOSITE,category-ads-all,REJECT
+
   - GEOSITE,cn,DIRECT
   - GEOIP,CN,DIRECT,no-resolve
+
   - MATCH,🚀 节点选择
 `;
 
