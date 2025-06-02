@@ -121,7 +121,7 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
     await TCP接口.opened;
   } else {
     try {
-      TCP接口 = await connect({ hostname: 访问地址, port: 访问端口 });
+      TCP接口 = await connect({ hostname: 访问地址, port: 访问端口, allowHalfOpen: true });
       await TCP接口.opened;
     } catch {
       // 尝试SOCKS5
@@ -130,42 +130,119 @@ async function 解析VL标头(VL数据, WS接口, TCP接口) {
           TCP接口 = await 创建SOCKS5接口(识别地址类型, 访问地址, 访问端口);
           await TCP接口.opened;
         } catch {
-          // SOCKS5失败，尝试反代
+          // SOCKS5失败 尝试NAT64
           try {
+            const NAT64地址 = 识别地址类型 === 1
+              ? 转换IPv4到NAT64(访问地址)
+              : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
+            TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
+            await TCP接口.opened;
+          } catch {
+            // NAT64失败 尝试反代
             let [反代IP地址, 反代IP端口] = 反代IP.split(":");
             TCP接口 = await connect({
               hostname: 反代IP地址,
               port: 反代IP端口 || 443,
             });
             await TCP接口.opened;
-          } catch {
-            // 反代失败，尝试NAT64
-            const NAT64地址 = 识别地址类型 === 1
-              ? 转换IPv4到NAT64(访问地址)
-              : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
-            TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
           }
         }
       } else {
-        // 没有SOCKS5，直接尝试反代
+        // 没有SOCKS5 尝试NAT64
         try {
+          const NAT64地址 = 识别地址类型 === 1
+            ? 转换IPv4到NAT64(访问地址)
+            : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
+          TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
+          await TCP接口.opened;
+        } catch {
+          // NAT64失败 尝试反代
           let [反代IP地址, 反代IP端口] = 反代IP.split(":");
           TCP接口 = await connect({
             hostname: 反代IP地址,
             port: 反代IP端口 || 443,
           });
           await TCP接口.opened;
-        } catch {
-          // 反代失败，尝试NAT64
-          const NAT64地址 = 识别地址类型 === 1
-            ? 转换IPv4到NAT64(访问地址)
-            : 转换IPv4到NAT64(await 解析域名到IPv4(访问地址));
-          TCP接口 = await connect({ hostname: NAT64地址, port: 访问端口 });
         }
       }
     }
   }
   建立传输管道(WS接口, TCP接口, 写入初始数据);
+}
+
+// 将IPv4地址转换为NAT64 IPv6地址
+function 转换IPv4到NAT64(ipv4地址) {
+  const 十六进制 = ipv4地址.split(".").map(段 => (+段).toString(16).padStart(2, "0"));
+  return `[${NAT64前缀}${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
+}
+
+// 解析域名到IPv4地址
+async function 解析域名到IPv4(域名) {
+  const { Answer } = await (await fetch(`https://${DOH地址}/dns-query?name=${域名}&type=A`, {
+    headers: { "Accept": "application/dns-json" }
+  })).json();
+  return Answer.find(({ type }) => type === 1).data;
+}
+
+function 验证VL的密钥(arr, offset = 0) {
+  const uuid = (
+    转换密钥格式[arr[offset + 0]] +
+    转换密钥格式[arr[offset + 1]] +
+    转换密钥格式[arr[offset + 2]] +
+    转换密钥格式[arr[offset + 3]] +
+    "-" +
+    转换密钥格式[arr[offset + 4]] +
+    转换密钥格式[arr[offset + 5]] +
+    "-" +
+    转换密钥格式[arr[offset + 6]] +
+    转换密钥格式[arr[offset + 7]] +
+    "-" +
+    转换密钥格式[arr[offset + 8]] +
+    转换密钥格式[arr[offset + 9]] +
+    "-" +
+    转换密钥格式[arr[offset + 10]] +
+    转换密钥格式[arr[offset + 11]] +
+    转换密钥格式[arr[offset + 12]] +
+    转换密钥格式[arr[offset + 13]] +
+    转换密钥格式[arr[offset + 14]] +
+    转换密钥格式[arr[offset + 15]]
+  ).toLowerCase();
+  return uuid;
+}
+
+const 转换密钥格式 = [];
+for (let i = 0; i < 256; ++i) {
+  转换密钥格式.push((i + 256).toString(16).slice(1));
+}
+
+// 第三步，创建客户端WS-CF-目标的传输通道并监听状态
+async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
+  WS接口.accept();
+  await WS接口.send(new Uint8Array([0, 0]).buffer);
+
+  const 传输数据 = TCP接口.writable.getWriter();
+  const 读取数据 = TCP接口.readable.getReader();
+
+  if (写入初始数据) await 传输数据.write(写入初始数据);
+
+  WS接口.addEventListener("message", async (event) => {
+    await 传输数据.write(event.data);
+  });
+  定时双端保活();
+  (async () => {
+    while (true) {
+      const { value: 返回数据, done } = await 读取数据.read();
+      if (done) break;
+      if (返回数据) await WS接口.send(返回数据);
+    }
+  })();
+  async function 定时双端保活() {
+    while (true) {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      传输数据.write(new Uint8Array(0));
+      WS接口.send('');
+    }
+  }
 }
 
 // SOCKS5部分
@@ -237,74 +314,6 @@ async function 获取SOCKS5代理(SOCKS5) {
   port = Number(latters.pop());
   hostname = latters.join(":");
   return { username, password, hostname, port };
-}
-
-// 将IPv4地址转换为NAT64 IPv6地址
-function 转换IPv4到NAT64(ipv4地址) {
-  const 十六进制 = ipv4地址.split(".").map(段 => (+段).toString(16).padStart(2, "0"));
-  return `[${NAT64前缀}${十六进制[0]}${十六进制[1]}:${十六进制[2]}${十六进制[3]}]`;
-}
-
-// 解析域名到IPv4地址
-async function 解析域名到IPv4(域名) {
-  const { Answer } = await (await fetch(`https://${DOH地址}/dns-query?name=${域名}&type=A`, {
-    headers: { "Accept": "application/dns-json" }
-  })).json();
-  return Answer.find(({ type }) => type === 1).data;
-}
-
-function 验证VL的密钥(arr, offset = 0) {
-  const uuid = (
-    转换密钥格式[arr[offset + 0]] +
-    转换密钥格式[arr[offset + 1]] +
-    转换密钥格式[arr[offset + 2]] +
-    转换密钥格式[arr[offset + 3]] +
-    "-" +
-    转换密钥格式[arr[offset + 4]] +
-    转换密钥格式[arr[offset + 5]] +
-    "-" +
-    转换密钥格式[arr[offset + 6]] +
-    转换密钥格式[arr[offset + 7]] +
-    "-" +
-    转换密钥格式[arr[offset + 8]] +
-    转换密钥格式[arr[offset + 9]] +
-    "-" +
-    转换密钥格式[arr[offset + 10]] +
-    转换密钥格式[arr[offset + 11]] +
-    转换密钥格式[arr[offset + 12]] +
-    转换密钥格式[arr[offset + 13]] +
-    转换密钥格式[arr[offset + 14]] +
-    转换密钥格式[arr[offset + 15]]
-  ).toLowerCase();
-  return uuid;
-}
-
-const 转换密钥格式 = [];
-for (let i = 0; i < 256; ++i) {
-  转换密钥格式.push((i + 256).toString(16).slice(1));
-}
-
-// 第三步，创建客户端WS-CF-目标的传输通道并监听状态
-async function 建立传输管道(WS接口, TCP接口, 写入初始数据) {
-  WS接口.accept();
-  await WS接口.send(new Uint8Array([0, 0]).buffer);
-
-  const 传输数据 = TCP接口.writable.getWriter();
-  const 读取数据 = TCP接口.readable.getReader();
-
-  if (写入初始数据) await 传输数据.write(写入初始数据);
-
-  WS接口.addEventListener("message", async (event) => {
-    await 传输数据.write(event.data);
-  });
-
-  (async () => {
-    while (true) {
-      const { value: 返回数据, done } = await 读取数据.read();
-      if (done) break;
-      if (返回数据) await WS接口.send(返回数据);
-    }
-  })();
 }
 
 // 其它
@@ -419,6 +428,7 @@ proxy-groups:
   type: select
   proxies:
     - ♻️ 延迟优选
+    - ♻️ 故障转移
 ${代理配置}
 - name: ♻️ 延迟优选
   type: url-test
@@ -427,8 +437,20 @@ ${代理配置}
   tolerance: 100
   proxies:
 ${代理配置}
+- name: ♻️ 故障转移
+  type: fallback
+  url: https://www.google.com/generate_204
+  interval: 30
+  proxies:
+${代理配置}
 
 rules:
+  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
+  - DOMAIN-SUFFIX,steamusercontent.com,DIRECT
+  - DOMAIN-SUFFIX,steamstatic.com,DIRECT
+  - DOMAIN-SUFFIX,steamserver.net,DIRECT
+  - DOMAIN-SUFFIX,steampowered.com,DIRECT
+
   - GEOSITE,category-ads-all,REJECT
   - GEOSITE,cn,DIRECT
   - GEOIP,CN,DIRECT,no-resolve
