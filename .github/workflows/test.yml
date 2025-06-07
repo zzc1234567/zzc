@@ -34,6 +34,7 @@ jobs:
           ./CloudflareST -cfcolo HKG -sl 5 -n 1000 -dn 5 -o SIN.csv
           ./CloudflareST -cfcolo NRT -sl 5 -n 1000 -dn 5 -o NRT.csv
           ./CloudflareST -cfcolo SEA -sl 5 -n 1000 -dn 5 -o SEA.csv
+          ./CloudflareST -cfcolo SEA -sl 5 -n 1000 -dn 5 -o IST.csv
           rm -f ip.txt
           python csv_to_txt.py
 
