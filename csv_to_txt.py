@@ -5,7 +5,8 @@ csv_files = [
     "KHH.csv",
     "SIN.csv",
     "NRT.csv",
-    "SEA.csv"
+    "SEA.csv",
+    "IST.csv",
 ]
 
 area_names = [
@@ -13,7 +14,8 @@ area_names = [
     "台湾",
     "新加坡",
     "东京",
-    "西雅图"
+    "西雅图",
+    "伊斯坦布尔",
 ]
 
 def csv_to_txt(csv_files, area_names, output_filename):
