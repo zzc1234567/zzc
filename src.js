@@ -37,17 +37,21 @@ export default {
     const 反代前缀 = `/${encodeURIComponent(订阅路径)}/`;
     if (url.pathname.startsWith(反代前缀)) {
       // 取出目标链接
-      const target = decodeURIComponent(url.pathname.slice(反代前缀.length));
-      // target 现在可以是 http/https 任意协议
-      if (target.startsWith("http://") || target.startsWith("https://")) {
-        const req = new Request(target + url.search, {
-          method: 访问请求.method,
-          headers: 访问请求.headers,
-          body: 访问请求.body,
-          redirect: "follow",
-        });
-        const resp = await fetch(req);
-        return resp;
+      let target = decodeURIComponent(url.pathname.slice(反代前缀.length));
+      try {
+        if (target.startsWith("http")) {
+          const req = new Request(target + url.search, {
+            method: 访问请求.method,
+            headers: 访问请求.headers,
+            body: 访问请求.body,
+            redirect: "follow",
+          });
+          const resp = await fetch(req);
+          return resp;
+        }
+        return new Response("格式错误", { status: 400 });
+      } catch {
+        return new Response("格式错误", { status: 400 });
       }
     }
 
