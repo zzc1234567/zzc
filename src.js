@@ -446,7 +446,7 @@ proxies:
 ${节点配置}
 
 proxy-groups:
-- name: 🚀 节点选择
+- name: 节点选择
   type: select
   proxies:
     - 延迟优选
@@ -470,7 +470,7 @@ rules:
   - GEOSITE,category-ads-all,REJECT
   - GEOSITE,cn,DIRECT
   - GEOIP,CN,DIRECT,no-resolve
-  - MATCH,🚀 节点选择
+  - MATCH,节点选择
 `;
 
   return new Response(配置内容, {
