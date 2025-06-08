@@ -28,15 +28,6 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 - **保存并部署**
 3. **导入订阅并开始使用**
 
-## Worker使用方法
-1. **Fork 本项目**
-2. **创建 Cloudflare Worker**
-- **导入您 Fork 的仓库**
-- **保存并部署**
-- **去设置配置环境变量**
-- **添加自定义域名(国内无法访问默认分配的域名)**
-3. **导入订阅并开始使用**
-
 <details>
 <summary><strong>建议操作：启用 GitHub Actions 同步上游仓库</strong></summary>
 
