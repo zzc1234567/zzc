@@ -39,7 +39,6 @@ export default {
       // 取出目标链接
       let target = decodeURIComponent(url.pathname.slice(反代前缀.length));
       try {
-        if (target.startsWith("http")) {
           const req = new Request(target + url.search, {
             method: 访问请求.method,
             headers: 访问请求.headers,
@@ -48,8 +47,6 @@ export default {
           });
           const resp = await fetch(req);
           return resp;
-        }
-        return new Response("格式错误", { status: 400 });
       } catch {
         return new Response("格式错误", { status: 400 });
       }
