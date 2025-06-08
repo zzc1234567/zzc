@@ -19,7 +19,7 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 
 如果本项目对您有帮助, 请点 Star 支持 !
 
-## Pages使用方法
+## 使用方法
 
 1. **Fork 本项目**
 2. **创建 Cloudflare Pages**
