@@ -28,10 +28,28 @@ export default {
     NAT64前缀 = env.NAT64 ?? NAT64前缀;
     DOH地址 = env.DOH ?? DOH地址;
 
+    const url = new URL(访问请求.url);
     const 读取我的请求标头 = 访问请求.headers.get("Upgrade");
     const WS请求 = 读取我的请求标头 == "websocket";
     const 不是WS请求 = 读取我的请求标头?.toLowerCase() !== "websocket";
-    const url = new URL(访问请求.url);
+
+    // 只允许 /订阅路径/ 开头的路径反代
+    const 反代前缀 = `/${encodeURIComponent(订阅路径)}/`;
+    if (url.pathname.startsWith(反代前缀)) {
+      // 取出目标链接
+      const target = decodeURIComponent(url.pathname.slice(反代前缀.length));
+      // target 现在可以是 http/https 任意协议
+      if (target.startsWith("http://") || target.startsWith("https://")) {
+        const req = new Request(target + url.search, {
+          method: 访问请求.method,
+          headers: 访问请求.headers,
+          body: 访问请求.body,
+          redirect: "follow",
+        });
+        const resp = await fetch(req);
+        return resp;
+      }
+    }
 
     if (不是WS请求) {
       if (url.pathname == `/${encodeURIComponent(订阅路径)}`) {
@@ -427,17 +445,17 @@ proxy-groups:
 - name: 🚀 节点选择
   type: select
   proxies:
-    - ♻️ 延迟优选
-    - ♻️ 故障转移
+    - 延迟优选
+    - 故障转移
 ${代理配置}
-- name: ♻️ 延迟优选
+- name: 延迟优选
   type: url-test
   url: https://www.google.com/generate_204
   interval: 30
   tolerance: 50
   proxies:
 ${代理配置}
-- name: ♻️ 故障转移
+- name: 故障转移
   type: fallback
   url: https://www.google.com/generate_204
   interval: 30
@@ -446,10 +464,8 @@ ${代理配置}
 
 rules:
   - GEOSITE,category-ads-all,REJECT
-
   - GEOSITE,cn,DIRECT
   - GEOIP,CN,DIRECT,no-resolve
-
   - MATCH,🚀 节点选择
 `;
 
