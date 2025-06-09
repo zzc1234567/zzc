@@ -37,13 +37,24 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 
 </details>
 
+<details>
+<summary><strong>反代说明</strong></summary>
+
+- 反代并非 `PROXY_IP`, 而是用于没有代理工具场景的简易代理
+- 使用方法: https://域名/订阅路径/https://github.com/ImLTHQ/
+- 你可以用于下载国外资源, 国内直连可能速度较慢
+
+请勿用于非法用途
+
+</details>
+
 ## 环境变量说明
 
 | 变量名 | 示例值 | 说明 |
 |-|-|-|
 | `SUB_PATH` | `订阅路径` | 域名/`订阅路径` |
-| `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 列表，格式：`地址:端口#节点名称`，端口默认 443 |
-| `PROXY_IP` | `ts.hpc.tw:443` | 反代地址和端口，端口不填默认 443 |
+| `TXT_URL` | `https://raw.domain.com/CFST.txt` | 优选 IP 列表, 格式：`地址:端口#节点名称`, 端口默认 443 |
+| `PROXY_IP` | `ts.hpc.tw:443` | 反代地址和端口, 端口不填默认 443 |
 | `SOCKS5` | `账号:密码@地址:端口` | SOCKS5 代理配置 |
 | `SOCKS5_GLOBAL` | `true` | 是否启用全局 SOCKS5 代理 |
 | `DOH` | `1.1.1.1` | DoH 地址 |
