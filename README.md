@@ -40,7 +40,7 @@ Edge Tunnel 是一个基于 Cloudflare Pages 的免费代理解决方案, 配置
 <details>
 <summary><strong>反代说明</strong></summary>
 
-- 反代并非 `PROXY_IP`, 而是用于没有代理工具场景的简易代理
+- 并非指的是 `PROXY_IP`, 而是用于没有代理工具场景的简易代理
 - 使用方法: https://域名/订阅路径/https://github.com/ImLTHQ/
 - 你可以用于下载国外资源, 国内直连可能速度较慢
 
