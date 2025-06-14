@@ -481,16 +481,6 @@ ${代理配置}
 ${代理配置}
 
 rules:
-  # Spotify 规则
-  - DOMAIN-REGEX,^[a-zA-Z0-9-]+spclient.spotify.com$,国内规则
-  - DOMAIN-REGEX,^[a-zA-Z0-9-]+dealer\.g2\.spotify\.com$,国内规则
-  - DOMAIN-SUFFIX,scdn.co,国内规则
-  - DOMAIN,spclient.wg.spotify.com,国内规则
-
-  - DOMAIN,api-partner.spotify.com,国内规则
-  - DOMAIN,login5.spotify.com,国内规则
-
-  # 基础规则
   - GEOSITE,category-ads-all,广告屏蔽
   - GEOSITE,cn,国内规则
   - GEOIP,CN,国内规则,no-resolve
