@@ -39,16 +39,15 @@ export default {
       // 取出目标链接
       let target = decodeURIComponent(url.pathname.slice(反代前缀.length));
       try {
-          const req = new Request(target + url.search, {
+          const 请求对象 = new Request(target + url.search, {
             method: 访问请求.method,
             headers: 访问请求.headers,
             body: 访问请求.body,
-            redirect: "follow",
           });
-          const resp = await fetch(req);
-          return resp;
+          const 响应对象 = await fetch(请求对象);
+          return 响应对象;
       } catch {
-        return new Response("格式错误", { status: 400 });
+        return new Response(null, { status: 404 });
       }
     }
 
@@ -443,9 +442,27 @@ proxies:
 ${节点配置}
 
 proxy-groups:
-- name: 节点选择
+- name: 海外规则
   type: select
   proxies:
+    - 延迟优选
+    - 故障转移
+    - DIRECT
+    - REJECT
+${代理配置}
+- name: 国内规则
+  type: select
+  proxies:
+    - DIRECT
+    - 延迟优选
+    - 故障转移
+    - REJECT
+${代理配置}
+- name: 广告屏蔽
+  type: select
+  proxies:
+    - REJECT
+    - DIRECT
     - 延迟优选
     - 故障转移
 ${代理配置}
@@ -464,10 +481,20 @@ ${代理配置}
 ${代理配置}
 
 rules:
-  - GEOSITE,category-ads-all,REJECT
-  - GEOSITE,cn,DIRECT
-  - GEOIP,CN,DIRECT,no-resolve
-  - MATCH,节点选择
+  # Spotify 规则
+  - DOMAIN-REGEX,^[a-zA-Z0-9-]+spclient.spotify.com$,国内规则
+  - DOMAIN-REGEX,^[a-zA-Z0-9-]+dealer\.g2\.spotify\.com$,国内规则
+  - DOMAIN-SUFFIX,scdn.co,国内规则
+  - DOMAIN,spclient.wg.spotify.com,国内规则
+
+  - DOMAIN,api-partner.spotify.com,国内规则
+  - DOMAIN,login5.spotify.com,国内规则
+
+  # 基础规则
+  - GEOSITE,category-ads-all,广告屏蔽
+  - GEOSITE,cn,国内规则
+  - GEOIP,CN,国内规则,no-resolve
+  - MATCH,海外规则
 `;
 
   return new Response(配置内容, {
